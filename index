@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PreçoRadar — Protótipo</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Sora', sans-serif; background: #F7F7F5; color: #1a1a18; min-height: 100vh; }
+
+  /* TOPBAR */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 28px; background: #fff; border-bottom: 0.5px solid #e0ddd6;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-mark {
+    width: 30px; height: 30px; background: #1D9E75; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-name { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; color: #1a1a18; }
+  .logo-name span { color: #1D9E75; }
+  .topbar-actions { display: flex; gap: 8px; }
+  .btn-outline {
+    padding: 7px 16px; font-size: 13px; font-weight: 500;
+    border: 0.5px solid #c0bdb5; border-radius: 8px;
+    background: transparent; color: #1a1a18; cursor: pointer; font-family: 'Sora', sans-serif;
+  }
+  .btn-primary {
+    padding: 7px 16px; font-size: 13px; font-weight: 500;
+    border: none; border-radius: 8px;
+    background: #1D9E75; color: #fff; cursor: pointer; font-family: 'Sora', sans-serif;
+  }
+
+  /* SEARCH BAR */
+  .search-bar {
+    display: flex; align-items: flex-end; gap: 10px;
+    padding: 16px 28px; background: #fff; border-bottom: 0.5px solid #e0ddd6;
+  }
+  .input-group { display: flex; flex-direction: column; gap: 5px; }
+  .input-label {
+    font-size: 10px; font-weight: 500; color: #888780;
+    letter-spacing: 0.6px; text-transform: uppercase;
+  }
+  .input-wrap {
+    display: flex; align-items: center; gap: 8px;
+    background: #F1EFE8; border: 0.5px solid #D3D1C7;
+    border-radius: 8px; padding: 0 12px; height: 40px;
+  }
+  .input-wrap input {
+    border: none; background: transparent;
+    font-size: 14px; font-family: 'DM Mono', monospace;
+    color: #1a1a18; flex: 1; outline: none;
+  }
+  .btn-search {
+    height: 40px; padding: 0 22px;
+    font-size: 13px; font-weight: 500;
+    border: none; border-radius: 8px;
+    background: #1D9E75; color: #fff;
+    cursor: pointer; font-family: 'Sora', sans-serif;
+    display: flex; align-items: center; gap: 7px;
+  }
+
+  /* TABS */
+  .tab-bar {
+    display: flex; gap: 0;
+    padding: 0 28px; background: #fff;
+    border-bottom: 0.5px solid #e0ddd6;
+  }
+  .tab {
+    padding: 11px 16px; font-size: 13px; font-weight: 500;
+    color: #888780; border-bottom: 2px solid transparent; cursor: pointer;
+  }
+  .tab.active { color: #1D9E75; border-bottom: 2px solid #1D9E75; }
+
+  /* MAIN LAYOUT */
+  .main { display: grid; grid-template-columns: 270px 1fr; min-height: calc(100vh - 185px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: #fff; border-right: 0.5px solid #e0ddd6;
+    padding: 20px 18px; display: flex; flex-direction: column; gap: 20px;
+  }
+  .product-card { border: 0.5px solid #e0ddd6; border-radius: 12px; overflow: hidden; }
+  .product-img {
+    width: 100%; height: 148px; background: #E1F5EE;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 6px;
+  }
+  .product-img-icon { font-size: 42px; line-height: 1; }
+  .product-img-label { font-size: 11px; font-weight: 500; color: #0F6E56; letter-spacing: 0.4px; text-transform: uppercase; }
+  .product-info { padding: 12px 14px; }
+  .product-tag {
+    font-size: 11px; font-weight: 500; color: #085041; background: #E1F5EE;
+    padding: 3px 9px; border-radius: 99px; display: inline-block; margin-bottom: 7px;
+  }
+  .product-name { font-size: 14px; font-weight: 500; color: #1a1a18; margin-bottom: 3px; }
+  .product-ean { font-size: 12px; color: #888780; font-family: 'DM Mono', monospace; }
+
+  .section-label {
+    font-size: 10px; font-weight: 500; color: #888780;
+    letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .location-row { display: flex; align-items: center; gap: 8px; }
+  .loc-dot { width: 8px; height: 8px; border-radius: 50%; background: #1D9E75; flex-shrink: 0; }
+  .loc-text { font-size: 13px; color: #1a1a18; }
+  .radius-chip {
+    font-size: 11px; font-weight: 500; color: #085041; background: #E1F5EE;
+    padding: 3px 9px; border-radius: 99px; display: inline-block; margin-top: 6px;
+  }
+  .suggestion-box {
+    background: #F1EFE8; border-radius: 8px; padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .suggestion-label { font-size: 11px; color: #888780; }
+  .suggestion-value { font-size: 22px; font-weight: 500; font-family: 'DM Mono', monospace; color: #1D9E75; }
+  .suggestion-sub { font-size: 11px; color: #888780; }
+
+  /* CONTENT */
+  .content { padding: 22px 24px; display: flex; flex-direction: column; gap: 24px; background: #F7F7F5; }
+
+  /* PRICE SUMMARY */
+  .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .price-card {
+    background: #fff; border-radius: 10px; padding: 16px 18px;
+    border: 0.5px solid #e0ddd6;
+  }
+  .price-card-label { font-size: 10px; font-weight: 500; color: #888780; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px; }
+  .price-card-value { font-size: 24px; font-weight: 500; font-family: 'DM Mono', monospace; margin-bottom: 3px; }
+  .price-card-value.min { color: #0F6E56; }
+  .price-card-value.avg { color: #1a1a18; }
+  .price-card-value.max { color: #993C1D; }
+  .price-card-sub { font-size: 12px; color: #888780; }
+
+  /* STORES */
+  .stores-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .stores-count { font-size: 12px; color: #888780; }
+  .stores-list { display: flex; flex-direction: column; gap: 6px; }
+  .store-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 16px; background: #fff;
+    border: 0.5px solid #e0ddd6; border-radius: 9px;
+  }
+  .store-rank { font-size: 12px; font-weight: 500; color: #888780; width: 22px; text-align: center; flex-shrink: 0; }
+  .store-rank.first { color: #0F6E56; }
+  .store-name { font-size: 13px; font-weight: 500; color: #1a1a18; flex: 1; }
+  .store-dist { font-size: 12px; color: #888780; min-width: 40px; }
+  .store-price { font-size: 14px; font-weight: 500; font-family: 'DM Mono', monospace; min-width: 70px; text-align: right; }
+  .store-price.best { color: #0F6E56; }
+  .store-price.worst { color: #993C1D; }
+  .best-badge {
+    font-size: 10px; font-weight: 500;
+    background: #E1F5EE; color: #085041;
+    padding: 3px 8px; border-radius: 5px;
+  }
+
+  /* BOTTOMBAR */
+  .bottombar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 28px; background: #fff;
+    border-top: 0.5px solid #e0ddd6;
+  }
+  .export-info { font-size: 13px; color: #888780; }
+  .export-info strong { color: #1a1a18; font-weight: 500; }
+  .export-actions { display: flex; gap: 8px; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="5" stroke="white" stroke-width="1.5"/>
+        <circle cx="8" cy="8" r="2" fill="white"/>
+        <line x1="8" y1="1" x2="8" y2="4" stroke="white" stroke-width="1.5"/>
+        <line x1="8" y1="12" x2="8" y2="15" stroke="white" stroke-width="1.5"/>
+        <line x1="1" y1="8" x2="4" y2="8" stroke="white" stroke-width="1.5"/>
+        <line x1="12" y1="8" x2="15" y2="8" stroke="white" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <span class="logo-name">Preço<span>Radar</span></span>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn-outline">Meus produtos</button>
+    <button class="btn-primary">+ Novo produto</button>
+  </div>
+</div>
+
+<!-- SEARCH BAR -->
+<div class="search-bar">
+  <div class="input-group">
+    <div class="input-label">Código EAN</div>
+    <div class="input-wrap" style="width: 220px;">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;color:#888780">
+        <rect x="1" y="2" width="1.5" height="10" fill="currentColor"/>
+        <rect x="4" y="2" width="1" height="10" fill="currentColor"/>
+        <rect x="6.5" y="2" width="2" height="10" fill="currentColor"/>
+        <rect x="10" y="2" width="1" height="10" fill="currentColor"/>
+        <rect x="12" y="2" width="1.5" height="10" fill="currentColor"/>
+      </svg>
+      <input type="text" value="7891000055120" placeholder="Ex: 7891000055120"/>
+    </div>
+  </div>
+  <div class="input-group">
+    <div class="input-label">CEP</div>
+    <div class="input-wrap" style="width: 150px;">
+      <svg width="13" height="14" viewBox="0 0 13 14" fill="none" style="flex-shrink:0;color:#888780">
+        <path d="M6.5 1C4.01 1 2 3.01 2 5.5c0 3.5 4.5 7.5 4.5 7.5s4.5-4 4.5-7.5C11 3.01 8.99 1 6.5 1z" stroke="currentColor" stroke-width="1.2" fill="none"/>
+        <circle cx="6.5" cy="5.5" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      <input type="text" value="01310-100" placeholder="Ex: 01310-100"/>
+    </div>
+  </div>
+  <div class="input-group">
+    <div class="input-label">Raio de busca</div>
+    <div class="input-wrap" style="width: 110px;">
+      <input type="text" value="2 km" readonly style="color:#888780"/>
+    </div>
+  </div>
+  <button class="btn-search">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <circle cx="6" cy="6" r="4.5" stroke="white" stroke-width="1.4"/>
+      <line x1="9.5" y1="9.5" x2="13" y2="13" stroke="white" stroke-width="1.4" stroke-linecap="round"/>
+    </svg>
+    Buscar preços
+  </button>
+</div>
+
+<!-- TABS -->
+<div class="tab-bar">
+  <div class="tab active">Resultado da busca</div>
+  <div class="tab">Histórico</div>
+  <div class="tab">Planilha de precificação</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <div class="product-card">
+      <div class="product-img">
+        <div class="product-img-icon">🧴</div>
+        <div class="product-img-label">Foto do produto</div>
+      </div>
+      <div class="product-info">
+        <span class="product-tag">Higiene pessoal</span>
+        <div class="product-name">Shampoo Seda 325ml</div>
+        <div class="product-ean">EAN: 7891000055120</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Localização da busca</div>
+      <div class="location-row">
+        <div class="loc-dot"></div>
+        <span class="loc-text">Av. Paulista, 1000 — SP</span>
+      </div>
+      <div style="margin-top: 6px; display: flex; align-items: center; gap: 8px;">
+        <span class="radius-chip">Raio: 2 km</span>
+        <span style="font-size:12px;color:#888780;">6 lojas</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Sugestão de preço</div>
+      <div class="suggestion-box">
+        <div class="suggestion-label">Preço competitivo sugerido</div>
+        <div class="suggestion-value">R$ 8,49</div>
+        <div class="suggestion-sub">5% abaixo da média local</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <div>
+      <div class="section-label">Resumo de preços na região</div>
+      <div class="price-grid">
+        <div class="price-card">
+          <div class="price-card-label">Menor preço</div>
+          <div class="price-card-value min">R$ 7,89</div>
+          <div class="price-card-sub">Carrefour Paulista</div>
+        </div>
+        <div class="price-card">
+          <div class="price-card-label">Preço médio</div>
+          <div class="price-card-value avg">R$ 8,94</div>
+          <div class="price-card-sub">6 lojas consultadas</div>
+        </div>
+        <div class="price-card">
+          <div class="price-card-label">Maior preço</div>
+          <div class="price-card-value max">R$ 10,49</div>
+          <div class="price-card-sub">Mercadinho São Paulo</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="stores-header">
+        <div class="section-label" style="margin-bottom:0;">Lojas encontradas</div>
+        <div class="stores-count">6 estabelecimentos · raio de 2 km</div>
+      </div>
+      <div class="stores-list">
+        <div class="store-row">
+          <div class="store-rank first">1°</div>
+          <div class="store-name">Carrefour Paulista</div>
+          <div class="store-dist">0,4 km</div>
+          <div class="store-price best">R$ 7,89</div>
+          <div class="best-badge">Melhor preço</div>
+        </div>
+        <div class="store-row">
+          <div class="store-rank">2°</div>
+          <div class="store-name">Extra Supermercado</div>
+          <div class="store-dist">0,8 km</div>
+          <div class="store-price">R$ 8,49</div>
+        </div>
+        <div class="store-row">
+          <div class="store-rank">3°</div>
+          <div class="store-name">Pão de Açúcar</div>
+          <div class="store-dist">1,1 km</div>
+          <div class="store-price">R$ 8,99</div>
+        </div>
+        <div class="store-row">
+          <div class="store-rank">4°</div>
+          <div class="store-name">Supermercado Verdemar</div>
+          <div class="store-dist">1,4 km</div>
+          <div class="store-price">R$ 9,19</div>
+        </div>
+        <div class="store-row">
+          <div class="store-rank">5°</div>
+          <div class="store-name">Atacadão Express</div>
+          <div class="store-dist">1,7 km</div>
+          <div class="store-price">R$ 9,79</div>
+        </div>
+        <div class="store-row">
+          <div class="store-rank">6°</div>
+          <div class="store-name">Mercadinho São Paulo</div>
+          <div class="store-dist">1,9 km</div>
+          <div class="store-price worst">R$ 10,49</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- BOTTOMBAR -->
+<div class="bottombar">
+  <div class="export-info">
+    Planilha com <strong>1 produto</strong> pronto para exportar
+  </div>
+  <div class="export-actions">
+    <button class="btn-outline">+ Adicionar produto</button>
+    <button class="btn-primary">⬇ Exportar planilha .xlsx</button>
+  </div>
+</div>
+
+</body>
+</html>
